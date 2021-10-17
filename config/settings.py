@@ -28,7 +28,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'admin',
+    'jupiter',
     'users',
+    'wallets',
 ]
 
 MIDDLEWARE = [
