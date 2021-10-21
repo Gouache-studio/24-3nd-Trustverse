@@ -1,7 +1,7 @@
 from django.urls import path
-# from wallets.views import WalletView
+from wallets.views import WalletBalanceView
 
 #API 따라서 만들기!!! 
 urlpatterns = [
-    # path('/getWallet', WalletView.as_view()),
+    path('', WalletBalanceView.as_view()),
 ]

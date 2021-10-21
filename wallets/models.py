@@ -9,4 +9,4 @@ class Wallet(models.Model):
     edited_at          = models.DateTimeField(auto_now =True, null = True)
     
     class Meta:
-        db_table = "wallets"
+        db_table = "wallet_balance"
