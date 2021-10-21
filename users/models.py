@@ -17,4 +17,4 @@ class User(models.Model):
     inctive_user       = models.BooleanField()    
     
     class Meta:
-        db_table = "users"
+        db_table = "trv_user"
