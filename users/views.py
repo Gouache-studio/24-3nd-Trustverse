@@ -36,10 +36,6 @@ class DashboardView(View):
                     "cumulative_num"      : cumulative_num
                 }
             )
-            #=============================================
-            # 쿼리셋으로 앱 개수별로 통신이 늘어남.
-            # 효율적인 통신은 아님! 어떻게 효율적 통신을 할지 생각하자. 
-            #=============================================
             
             #1. 앱별 가입자 수 #2. 앱별 가입자 비율
             apps = User.objects.values('appname').annotate(count_app=Count('appname'))
@@ -91,6 +87,7 @@ class DashboardView(View):
                     {
                         "year_month" : year_month,
                         "mothly_num" : count_user
+                        #mon
                     }
                 )
             #    User.objects.filter(register_date = )
@@ -117,12 +114,11 @@ class DashboardView(View):
                     }
                 )
             
-            country = User.objects.values('country').annot
-            phone_query = User.objects.values('phone_no')
-            for query in phone_query:
-                if query['phone_no'][:2] == 82:
-                    country = 'KR'
-      
+            # country = User.objects.values('country').annot
+            # phone_query = User.objects.values('phone_no')
+            # for query in phone_query:
+            #     if query['phone_no'][:2] == 82:
+                    
                         
             # for flag in country:
             #     country_num = User.objects.filter(country = flag)

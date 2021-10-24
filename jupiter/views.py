@@ -7,7 +7,7 @@ from .models import Report
 
 #예외처리까지 생각할 것!! try except
 class ReportListView(View):
-    @authentication
+    # @authentication
     def get(self, request):
         try:         
             response = requests.get('https://jupiterapiserver.azurewebsites.net/main/reports').json()
