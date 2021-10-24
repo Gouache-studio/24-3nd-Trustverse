@@ -7,18 +7,21 @@ from datetime import datetime, timedelta
 from my_settings import SECRET_KEY, ALGORITHM
 from admin.models import Admin
 
-
 class SignUpView(View):
     def post(self, request):
         data = json.loads(request.body)
-
         REGEX_PASSWORD = re.compile("^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,}$") 
 
         password = data["password"]
 
+        print('=====================')
+        print(data["name"])
+        print('=====================')
         if Admin.objects.filter(name = data["name"]).exists():
             return JsonResponse({"MESSAGE" : "DUPLICATED ADMIN NAME"}, status = 400)
-
+        
+        print('=====================')
+        print(data["password"])
         if not REGEX_PASSWORD.match(data["password"]):
             return JsonResponse({"MESSAGE" : "PASSWORD_ERROR"}, status = 400)
         

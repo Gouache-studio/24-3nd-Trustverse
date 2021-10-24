@@ -70,7 +70,7 @@ class WalletBalanceView(View):
                     
                 if balance == "None":
                     balance = None
-                    coin_list = [0]
+                    coin_list = []
                     values = None
                     password = 0
                     num = 0
