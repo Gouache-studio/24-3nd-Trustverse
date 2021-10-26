@@ -28,6 +28,8 @@ class SignUpView(View):
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
         decoded_password = hashed_password.decode("utf-8")
 
+        # query = f'SELECT walletID FROM wallet_balance WHERE email = "{current_user}" and walletID = "{walletID}"'
+
         Admincustom.objects.create(
             name = data["name"],
             password = decoded_password
@@ -54,4 +56,4 @@ class SignInView(View):
 
         except KeyError:
             return JsonResponse({"MESSAGE": "KEY_ERROR"}, status=400)
-            
+

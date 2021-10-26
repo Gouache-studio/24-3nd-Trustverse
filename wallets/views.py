@@ -8,7 +8,7 @@ from .models import Wallet
 from core.utils import authentication
  
 class WalletBalanceView(View):
-    @authentication
+    # @authentication
     def get(self, request):
         try:
             search_keyword = request.GET.get("keyword", None)
@@ -23,9 +23,8 @@ class WalletBalanceView(View):
             #     q.add(Q(fit__in = fit_id), Q.AND)
             #=====================================
 
-
             if search_keyword:
-                q &= Q(name__icontains=search_keyword)
+                q &= Q(wallet_balance__icontains=search_keyword)
              
             wallets = Wallet.objects.filter(q).order_by(ordering) 
             
@@ -51,8 +50,11 @@ class WalletBalanceView(View):
                 print("===========")
                 
                 if not balance == "None":
-                    balance = eval(balance)
+                    #딕셔너리로 인식함
+                    balance = literal_eval(balance)
                     coin_list = list(balance.keys())
+                    key_list = ['symbol', 'address', 'balance', 'name']
+
                     values = list(balance.values())
                     password = values[0][:1][0]
                     num = values[0][1:][0]

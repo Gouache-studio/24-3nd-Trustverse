@@ -4,6 +4,7 @@ from django.http import JsonResponse
 
 from my_settings  import SECRET_KEY, ALGORITHM
 from django.contrib.auth.models import User
+
 # 인증
 def authentication(func):
     def wrapper(self, request, *args, **kwargs):

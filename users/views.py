@@ -21,7 +21,7 @@ class DashboardView(View):
                 "User_Appratio" : [],
                 "User_Socialtype" : [],
                 "Country" : [],
-                "Monthly_New_User" : [],
+                "Monthly_User" : [],
                 "Total" :  [],
             }
 
@@ -51,6 +51,7 @@ class DashboardView(View):
                         "app_num" : count_app
                     }
                 )
+
                 user_ratio = round((count_app/total_register_num)*100)
                 result["User_Appratio"].append(
                     {
@@ -76,18 +77,37 @@ class DashboardView(View):
                     }
                 )
             
-            
+            # a = User.objects.filter(inctive_user = 0).annotate(month=TruncMonth('register_datetime')).
+            # print("====")
+            # print(a)
+            # print("====")
+
             #5. 월별 가입자 수 총 현재월일 부터 12개월 전 까지
-            monthly_users = User.objects.annotate(month=TruncMonth('register_datetime')).values('month').annotate(count_monthly_users=Count('id_trv_user'))[:12]
-            
-            for monthly_user in monthly_users:
-                year_month = str(monthly_user['month']).split('-')[:2]
-                count_user = monthly_user['count_monthly_users']
-                result["Monthly_New_User"].append(
+            # monthly_users = User.objects.annotate(month=TruncMonth('register_datetime')).values('month').annotate(count_monthly_users=Count('id_trv_user'))[:12]
+            count_group_month = User.objects.annotate(month=TruncMonth('register_datetime')).values('month').annotate(count_monthly_users=Count('id_trv_user'))
+            register_users = count_group_month.filter(inctive_user=0)[:12]
+            withdrawn_users = count_group_month.filter(inctive_user=1)[:12]
+
+            for register_user in register_users:
+
+                year_month = str(register_user['month']).split('-')[:2]
+                count_user = register_user['count_monthly_users']
+
+                result["Monthly_User"].append(
                     {
-                        "year_month" : year_month,
-                        "mothly_num" : count_user
-                        #mon
+                        "year_month"   : year_month,
+                        "monthly_num"  : count_user,
+                    }
+                )
+            for withdrawn_user in withdrawn_users:
+
+                year_month = str(withdrawn_user['month']).split('-')[:2]
+                count_user = withdrawn_user['count_monthly_users']
+
+                result["Monthly_User"].append(
+                    {
+                        "year_month"   : year_month,
+                        "monthly_withdrawn_num"  : count_user,
                     }
                 )
             #    User.objects.filter(register_date = )
@@ -155,7 +175,7 @@ class UserListView(View):
             #     q.add(Q(fit__in = fit_id), Q.AND)
 
             if search_keyword:
-                q &= Q(name__icontains=search_keyword)
+                q &= Q(email__icontains=search_keyword)
             #==========================================
             
             users = User.objects.filter(q).order_by(ordering) 
