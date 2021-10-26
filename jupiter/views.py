@@ -81,23 +81,26 @@ class ReportDeleteView(View):
     def delete(self, request):
         try:
             data = json.loads(request.body)
-            print("==========")
+            print("1==========")
             print(request.body)
             print("==========")
 
             report_id = data["report_id"]
+            print("2==========")
+            print(report_id)
 
             url = "https://jupiterapiserver-dev.azurewebsites.net/main/reports"
             headers = {"report_id" : f'{report_id}'}
             response = requests.request("DELETE", url, headers=headers).json()
-            print("==========")        
+
+            print("=====3=====")        
             print(response)
-            print("==========")
+            
             if response == {}:
                 return JsonResponse({"DELETE REPORT_ID" : report_id}, status = 200)
             
-            elif response != {}:
-                return JsonResponse({"MESSAGE", "INTERNAL SERVER"}, status =500, safe=False)
+            if response != {}:
+                return JsonResponse({"MESSAGE", "INTERNAL SERVER"}, satus=500)
         except KeyError:
             return JsonResponse({"MESSAGE":"KEY_ERROR"}, status = 400)
  
