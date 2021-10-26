@@ -1,24 +1,27 @@
-import json, requests
+import json
+import requests
+
 from django.http import JsonResponse
+from django.core.files import File
+
 from django.views import View
+from requests.api import head
 
 from core.utils import authentication
 from .models import Report
 
-#예외처리까지 생각할 것!! try except
+
 class ReportListView(View):
     # @authentication
     def get(self, request):
-        try:         
-            response = requests.get('https://jupiterapiserver.azurewebsites.net/main/reports').json()
+        try:  
+            response = requests.get('https://jupiterapiserver-dev.azurewebsites.net/main/reports').json()
             reports = response["reports"]
             
             result = []
             
             for report in reports:
-                
-                #report Object(1) (2) (3) (4) .... 
-                #(1)
+               
                 cover_link = report["titlepicture"]
                 content_link = report["pdfurl"]
                 cover_filename = cover_link.split("/")[4].split("?")[0]
@@ -35,28 +38,6 @@ class ReportListView(View):
                         "content_link" : content_link
                     }
                 )
-            for i in range(0, len(result)):
-
-                report_id = result[i]["report_id"]
-        
-                #똑같은 report_id가 없으면 데이터 베이스에 추가하고 
-                if not Report.objects.filter(report_id = report_id).exists():
-                    title         = result[i]["title"]  
-                    brief         = result[i]["brief"]
-                    title_picture = result[i]["cover_link"]
-                    pdf_url       = result[i]["content_link"]
-
-                    Report.objects.create(
-                        report_id = report_id,
-                        title = title,
-                        brief = brief,
-                        titlepicture = title_picture,
-                        pdfurl = pdf_url
-                    )
-                
-                #똑같은 report_id가 있다면, pass해라 
-                if Report.objects.filter(report_id = report_id).exists():
-                    continue
             
             return JsonResponse({"reports" : result},status = 200)
 
@@ -64,24 +45,59 @@ class ReportListView(View):
             return JsonResponse({"MESSAGE":"KEY_ERROR"}, status = 400)
 
 
+class ReportEditView(View): 
+    # @authentication
+    def put(self, request):
+        try: 
+            data = json.loads(request.body)
+            print("==========")
+            print(request.body)
+            print("==========")
 
-#=================================================================
-# class ReportEditView(View): #title or description만 수정할 수 있음!! 
-#     def post(self, request):
-#         data = json.loads(request.body)
+            report_id = data["report_id"]
+            title = data["title"]
+            brief = data["brief"]
 
-#         id = 
-#==================================================================
+            url = "https://jupiterapiserver-dev.azurewebsites.net/main/reports"
+            
+            payload=f'report_id={report_id}&title={title}&brief={brief}'
+            headers = {
+                'Content-Type' : 'application/x-www-form-urlencoded',
+                "Accept"       : "application/json"
+                }
+            response = requests.request("PUT", url, headers=headers, data=payload).json()
+            print("======")
+            print(response)
+            print("======")
+            
+            if response == {}:
+                return JsonResponse({"result" : "EDIT SUCCESS!"}, status =200)
 
+        except KeyError:
+            return JsonResponse({"MESSAGE":"KEY_ERROR"}, status = 400)
+        
 class ReportDeleteView(View):
-    @authentication
-    def post(self, request):
-        data = json.loads(request.body)
+    # @authentication
+    def delete(self, request):
+        try:
+            data = json.loads(request.body)
+            print("==========")
+            print(request.body)
+            print("==========")
 
-        id = data["report_id"]
-        report = Report.objects.get(report_id = id)
-        delete_report_id = report.report_id
-        report.delete()
+            report_id = data["report_id"]
 
-        return JsonResponse({"DELETE REPORT_ID" : delete_report_id}, status = 200)
-
+            url = "https://jupiterapiserver-dev.azurewebsites.net/main/reports"
+            headers = {"report_id" : f'{report_id}'}
+            response = requests.request("DELETE", url, headers=headers).json()
+            print("==========")        
+            print(response)
+            print("==========")
+            if response == {}:
+                return JsonResponse({"DELETE REPORT_ID" : report_id}, status = 200)
+            
+            elif response != {}:
+                return JsonResponse({"MESSAGE", "INTERNAL SERVER"}, status =500, safe=False)
+        except KeyError:
+            return JsonResponse({"MESSAGE":"KEY_ERROR"}, status = 400)
+ 
